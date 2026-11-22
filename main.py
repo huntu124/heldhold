@@ -16,6 +16,7 @@ only — same input, same note, every run.
 Usage:
     python3.13 main.py              # compose + write /output/entry.txt
     python3.13 main.py --preview    # print without writing
+    python3.13 main.py --quiet      # write silently (for scripts)
     python3.13 main.py --voice soft | steadier | wry
 """
 
@@ -94,6 +95,8 @@ def main(argv: list[str] | None = None) -> int:
                    help="which note to compose (default: soft)")
     p.add_argument("--preview", action="store_true",
                    help="print the note without writing /output/entry.txt")
+    p.add_argument("--quiet", action="store_true",
+                   help="suppress the stderr status line (for scripts)")
     args = p.parse_args(argv)
 
     note = compose(args.voice)
@@ -107,8 +110,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     path = write_entry(note, OUTPUT_PATH)
-    print(note)
-    print(f"wrote {path} ({n_chars} code points)", file=sys.stderr)
+    if not args.quiet:
+        print(note)
+        print(f"wrote {path} ({n_chars} code points)", file=sys.stderr)
     return 0
 
 
